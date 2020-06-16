@@ -1,6 +1,7 @@
 package regionlocker;
 
 import com.google.inject.Provides;
+import goaltracker2.GoalTrackerPlugin;
 import lombok.AccessLevel;
 import lombok.Setter;
 import net.runelite.api.Client;
@@ -64,6 +65,9 @@ public class RegionLockerPlugin extends Plugin {
     @Inject
     private ConfigManager configManager;
 
+    @Inject
+    private GoalTrackerPlugin goalTrackerPlugin;
+
     @Setter(AccessLevel.PACKAGE)
     private boolean unlockKeyPressed = false;
 
@@ -80,7 +84,7 @@ public class RegionLockerPlugin extends Plugin {
 
     @Override
     protected void startUp() throws Exception {
-        regionLocker = new RegionLocker(client, config, configManager);
+        regionLocker = new RegionLocker(client, config, configManager, goalTrackerPlugin);
         overlayManager.add(regionLockerOverlay);
         overlayManager.add(regionBorderOverlay);
         keyManager.registerKeyListener(inputListener);

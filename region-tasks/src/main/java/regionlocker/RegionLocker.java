@@ -1,5 +1,6 @@
 package regionlocker;
 
+import goaltracker2.Goal;
 import goaltracker2.GoalTrackerPlugin;
 import lombok.Getter;
 import net.runelite.api.Client;
@@ -19,7 +20,7 @@ public class RegionLocker {
     private final Client client;
     private final RegionLockerConfig config;
     private final ConfigManager configManager;
-    private static GoalTrackerPlugin goalTrackerPlugin;
+    private GoalTrackerPlugin goalTrackerPlugin;
 
     @Getter
     public static Map<String, RegionTypes> regions = new HashMap<>();
@@ -32,16 +33,17 @@ public class RegionLocker {
     private static boolean unlockUnderground;
 
     @Inject
-    RegionLocker(Client client, RegionLockerConfig config, ConfigManager configManager) {
+    RegionLocker(Client client, RegionLockerConfig config, ConfigManager configManager, GoalTrackerPlugin goalTrackerPlugin) {
         this.client = client;
         this.config = config;
         this.configManager = configManager;
+        this.goalTrackerPlugin = goalTrackerPlugin;
         readConfig();
     }
 
-    public static void setPlugin(GoalTrackerPlugin plugin) {
-        goalTrackerPlugin = plugin;
-    }
+//    public static void setPlugin(GoalTrackerPlugin plugin) {
+//        goalTrackerPlugin = plugin;
+//    }
 
     private List<String> StringToList(String s) {
         List<String> regs;
@@ -124,8 +126,15 @@ public class RegionLocker {
             regions.put(id, RegionTypes.ACTIVE);
             goalTrackerPlugin.addGoal();
         }
-        else
+        else{
             regions.remove(id);
+            for (Goal goal: goalTrackerPlugin.getGoals()) {
+                if (goal.getChunk() == regionId){
+                    goalTrackerPlugin.deleteGoal(goal);
+                    break;
+                }
+            }
+        }
         setConfig();
     }
 

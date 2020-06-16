@@ -114,7 +114,6 @@ public class GoalTrackerPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		RegionLocker.setPlugin(this);
 		loadConfig(configManager.getConfiguration(CONFIG_GROUP, CONFIG_KEY)).forEach(goals::add);
 
 		pluginPanel = injector.getInstance(GoalTrackerPanel.class);
@@ -189,14 +188,16 @@ public class GoalTrackerPlugin extends Plugin
 
 	public void addGoal()
 	{
+		int activeRegionID = regionTasksPlugin.getMapSquareID();
+
 		for (Goal goal: goals){
-			if (goal.getName() == regionTasksPlugin.getActiveMapSquare().getLocationName()){
+			if (goal.getChunk() == activeRegionID){
 				return;
 			}
 		}
 		Goal newGoal = new Goal(
-				regionTasksPlugin.getActiveMapSquare().getLocationName(),
-				regionTasksPlugin.getMapSquareID(),
+				regionTasksPlugin.getMapSquareInfo(activeRegionID).getLocationName(),
+				activeRegionID,
 				new ArrayList<>(),
 				false
 		);
